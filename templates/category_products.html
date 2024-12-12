@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Category Products{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5 display-4 fw-bold">Products</h1>
+    
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm hover-zoom">
+                <div class="product-badge">
+                    {% if product.giamgia %}
+                        <span class="badge bg-danger">Sale {{ product.giamgia }}%</span>
+                    {% endif %}
+                    {% if product.moi %}
+                        <span class="badge bg-success">New</span>
+                    {% endif %}
+                </div>
+                <div class="card-img-wrapper">
+                    <img src="{{ product.hinhanh }}" class="card-img-top product-img" alt="{{ product.tendienthoai }}">
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title text-truncate">{{ product.tendienthoai }}</h5>
+                    <div class="price-wrapper mb-3">
+                        {% if product.giamgia %}
+                            <span class="text-decoration-line-through text-muted me-2">${{ product.gia }}</span>
+                            <span class="text-danger fw-bold">${{ product.gia * (1 - product.giamgia/100) }}</span>
+                        {% else %}
+                            <span class="fw-bold">${{ product.gia }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="/product/{{ product.madt }}" class="btn btn-primary btn-hover">
+                            <i class="fas fa-search me-2"></i>View Details
+                        </a>
+                        <button class="btn btn-outline-primary btn-hover add-to-cart">
+                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.hover-zoom {
+    transition: transform 0.3s ease;
+}
+.hover-zoom:hover {
+    transform: translateY(-5px);
+}
+.product-img {
+    height: 200px;
+    object-fit: contain;
+    padding: 1rem;
+}
+.product-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+.btn-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.card-img-wrapper {
+    overflow: hidden;
+    background: #f8f9fa;
+}
+.price-wrapper {
+    min-height: 24px;
+}
+</style>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Order Summary{% endblock %}
+
+{% block content %}
+<h1>Order Summary</h1>
+<p>Thank you for your order!</p>
+<p>Order ID: {{ order_id }}</p>
+<p>Shipping Address: {{ shipping_address }}</p>
+<p>Total Amount: ${{ total_amount }}</p>
+<a href="/">Back to Home</a>
+{% endblock %}

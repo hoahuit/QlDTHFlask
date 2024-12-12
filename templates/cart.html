@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <h1 class="text-center mb-5 fw-bold">Your Shopping Cart</h1>
+    {% if cart %}
+    <div class="row g-4">
+        <!-- Left Column - Product List -->
+        <div class="col-lg-8">
+            <div class="card shadow-lg rounded-3 h-100">
+                <div class="card-header bg-white py-3">
+                    <h4 class="mb-0">Shopping Items ({{ cart|length }})</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% for item in cart %}
+                    <div class="row align-items-center mb-4 pb-3 border-bottom">
+                        <div class="col-md-2">
+                            <!-- Hiển thị hình ảnh -->
+                            {% if item.get('image') %}
+                                <img src="{{ item.get('image') }}" 
+                                     alt="{{ item.get('name', 'Product') }}" 
+                                     class="rounded-3 shadow-sm img-fluid" 
+                                     style="width: 100px; height: 100px; object-fit: cover;">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/default-product.jpg') }}" 
+                                     alt="{{ item.get('name', 'Product') }}" 
+                                     class="rounded-3 shadow-sm img-fluid" 
+                                     style="width: 100px; height: 100px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="fw-semibold mb-2">{{ item.name }}</h5>
+                            <p class="text-primary mb-0">${{ "%.2f" | format(item.price | float) }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <form method="POST" 
+                                  action="{{ url_for('update_cart', product_id=item.id) }}" 
+                                  class="d-flex align-items-center gap-2">
+                                <input type="number" 
+                                       name="quantity" 
+                                       value="{{ item.quantity }}" 
+                                       min="1" 
+                                       class="form-control form-control-sm rounded-pill" 
+                                       style="width: 70px;">
+                                <button type="submit" 
+                                        class="btn btn-sm btn-outline-primary rounded-pill">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="fw-bold text-success">
+                                ${{ "%.2f" | format((item.price | float) * (item.quantity | int)) }}
+                            </span>
+                        </div>
+                        <div class="col-md-1">
+                            <form method="POST" action="{{ url_for('remove_from_cart', product_id=item.id) }}">
+                                <button type="submit" 
+                                        class="btn btn-sm btn-outline-danger rounded-circle">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Order Summary -->
+        <div class="col-lg-4">
+            <div class="card shadow-lg rounded-3">
+                <div class="card-header bg-white py-3">
+                    <h4 class="mb-0">Order Summary</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Subtotal</span>
+                            <span class="fw-semibold">${{ "%.2f" | format(total | float) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Shipping</span>
+                            <span class="text-success">Free</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="h5">Total</span>
+                            <span class="h4 text-primary fw-bold">${{ "%.2f" | format(total | float) }}</span>
+                        </div>
+                    </div>
+                    
+                    <a href="/checkout" 
+                       class="btn btn-primary btn-lg w-100 rounded-pill mb-3">
+                        Proceed to Checkout
+                        <i class="fas fa-lock ms-2"></i>
+                    </a>
+                    
+                    <div class="text-center">
+                        <a href="/" class="text-decoration-none">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card shadow-lg rounded-3 p-5 text-center" style="max-width: 600px; margin: 0 auto;">
+        <div class="mb-4">
+            <i class="fas fa-shopping-cart fa-4x text-muted"></i>
+        </div>
+        <h3 class="mb-3">Your cart is empty</h3>
+        <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
+        <a href="/" class="btn btn-primary btn-lg rounded-pill px-5">
+            Start Shopping <i class="fas fa-store ms-2"></i>
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
