@@ -1,0 +1,45 @@
+{% extends "baseadmin.html" %}
+
+{% block content %}
+<div class="container">
+    <h3>View Order Details</h3>
+    <p><strong>Order ID:</strong> {{ order[0] }}</p>
+    <p><strong>Customer Name:</strong> {{ order[1] }}</p>
+    <p><strong>Email:</strong> {{ order[2] }}</p>
+    <p><strong>Total Amount:</strong> {{ order[3] }}</p>
+
+    <h4>Order Status</h4>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="shipping_status" class="form-label">Shipping Status</label>
+            <select name="shipping_status" id="shipping_status" class="form-control">
+                {% for status in shipping_statuses %}
+                    <option value="{{ status[0] }}" {% if status[0] == order[5] %}selected{% endif %}>
+                        {{ status[1] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="payment_status" class="form-label">Payment Status</label>
+            <select name="payment_status" id="payment_status" class="form-control">
+                {% for status in payment_statuses %}
+                    <option value="{{ status[0] }}" {% if status[0] == order[4] %}selected{% endif %}>
+                        {{ status[1] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Status</button>
+    </form>
+
+    <h4>Order Items</h4>
+    <ul>
+        {% for item in order_details %}
+            <li>{{ item[2] }} ({{ item[0] }} x {{ item[1] }})</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

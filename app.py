@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Thay 'your_secret_key' bằng chuỗi bất kỳ
 # Kết nối cơ sở dữ liệu
 def get_db_connection():
-    connection = pyodbc.connect('DRIVER={SQL Server};SERVER=THLONE\SQLEXPRESS;DATABASE=quanlybandienthoai;Trusted_Connection=yes')
+    connection = pyodbc.connect('DRIVER={SQL Server};SERVER=minhhoa;DATABASE=quanlybandienthoai;Trusted_Connection=yes')
     return connection
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
@@ -206,24 +206,7 @@ def add_category():
         flash('Category added successfully!', 'success')
         return redirect(url_for('manage_categories'))
     return render_template('add_category.html')
-@app.route('/admin/view-order/<int:order_id>', methods=['GET'])
-def view_order(order_id):
-    connection = get_db_connection()
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM donhang WHERE madonhang = ?", order_id)
-    order = cursor.fetchone()
 
-    cursor.execute("""
-        SELECT c.soluong, c.dongia, p.tendienthoai
-        FROM chitietdonhang c
-        JOIN dienthoai p ON c.madt = p.madt
-        WHERE c.madonhang = ?
-    """, order_id)
-    order_details = cursor.fetchall()
-
-    connection.close()
-
-    return render_template('view_order.html', order=order, order_details=order_details)
 @app.route('/admin/dashboard')
 def admin_dashboard():
     connection = get_db_connection()
@@ -326,17 +309,41 @@ def admin_dashboard():
                          top_products=top_products,
                          orders_chart_data=orders_chart_data,
                          categories_chart_data=categories_chart_data)
-@app.route('/admin/delete-order/<int:order_id>', methods=['POST'])
-def delete_order(order_id):
-    connection = get_db_connection()
-    cursor = connection.cursor()
-    cursor.execute("UPDATE donhang SET isdelete = 1 WHERE madonhang = ?", order_id)
-    connection.commit()
-    connection.close()
-    
-    flash('Order deleted successfully!', 'success')
-    return redirect(url_for('manage_orders'))
+@app.route('/admin/add-order', methods=['GET', 'POST'])
+def add_order():
+    if request.method == 'POST':
+        # Handle order creation logic
+        user_id = request.form['user_id']
+        total = request.form['total']
+        shipping_address = request.form['shipping_address']
+        payment_method = request.form['payment_method']
 
+        # Insert into the donhang table
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor()
+            cursor.execute("""
+                INSERT INTO donhang (mand, tongtien, diachigiaohang, matrangthai_giaohang, matrangthai_thanhtoan, phuongthucthanhtoan)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, user_id, total, shipping_address, 1, 1, payment_method)  # Default to "1" for both shipping and payment status
+            connection.commit()
+
+            # Get the order ID
+            cursor.execute("SELECT @@IDENTITY AS madonhang")
+            order_id = cursor.fetchone()[0]
+
+            # Add order details here (you would typically loop over the products being ordered)
+            # For now, we will skip this part
+
+            connection.commit()
+            connection.close()
+            flash('Order added successfully!', 'success')
+            return redirect(url_for('manage_orders'))  # Redirect to the manage orders page
+        except Exception as e:
+            flash(f'An error occurred: {str(e)}', 'danger')
+            return redirect(url_for('manage_orders'))  # Handle error and redirect back to manage orders
+
+    return render_template('add_order.html')  # Render the add order form
 @app.route('/admin/edit-category/<int:category_id>', methods=['GET', 'POST'])
 def edit_category(category_id):
     connection = get_db_connection()
@@ -351,16 +358,92 @@ def edit_category(category_id):
         flash('Category updated successfully!', 'success')
         return redirect(url_for('manage_categories'))
     return render_template('edit_category.html', category=category)
-@app.route('/admin/manage-orders', methods=['GET'])
+@app.route('/admin/manage_orders', methods=['GET'])
 def manage_orders():
-    # Lấy danh sách các đơn hàng từ cơ sở dữ liệu
     connection = get_db_connection()
     cursor = connection.cursor()
-    cursor.execute("SELECT madonhang, ngaydat, tongtien, phuongthucthanhtoan, matrangthai FROM donhang WHERE isdelete = 0")
+
+    cursor.execute("""
+        SELECT d.madonhang, n.tennguoidung, d.tongtien, tg.tentrangthai AS trangthai_giaohang, 
+        dt.tentrangthai AS trangthai_thanhtoan
+        FROM donhang d
+        JOIN nguoidung n ON d.mand = n.mand
+        JOIN trangthai_giaohang tg ON d.matrangthai_giaohang = tg.matrangthai
+        JOIN trangthai_thanhtoan dt ON d.matrangthai_thanhtoan = dt.matrangthai
+        WHERE d.isdelete = 0
+    """)
     orders = cursor.fetchall()
     connection.close()
-    
+
     return render_template('manage_orders.html', orders=orders)
+@app.route('/admin/view-order/<int:order_id>', methods=['GET', 'POST'])
+def view_order(order_id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Fetch order and details
+    cursor.execute("""
+        SELECT d.madonhang, n.tennguoidung, n.email, d.tongtien, d.phuongthucthanhtoan, 
+               tg.tentrangthai AS trangthai_giaohang, dt.tentrangthai AS trangthai_thanhtoan
+        FROM donhang d
+        JOIN nguoidung n ON d.mand = n.mand
+        JOIN trangthai_giaohang tg ON d.matrangthai_giaohang = tg.matrangthai
+        JOIN trangthai_thanhtoan dt ON d.matrangthai_thanhtoan = dt.matrangthai
+        WHERE d.madonhang = ?
+    """, (order_id,))
+    order = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT c.soluong, c.dongia, p.tendienthoai
+        FROM chitietdonhang c
+        JOIN dienthoai p ON c.madt = p.madt
+        WHERE c.madonhang = ?
+    """, (order_id,))
+    order_details = cursor.fetchall()
+
+    # Get shipping status options
+    cursor.execute("SELECT matrangthai, tentrangthai FROM trangthai_giaohang WHERE isdelete = 0")
+    shipping_statuses = cursor.fetchall()
+
+    # Get payment status options
+    cursor.execute("SELECT matrangthai, tentrangthai FROM trangthai_thanhtoan WHERE isdelete = 0")
+    payment_statuses = cursor.fetchall()
+
+    connection.close()
+
+    if request.method == 'POST':
+        shipping_status = request.form['shipping_status']
+        payment_status = request.form['payment_status']
+
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        # Update the order status
+        cursor.execute("""
+            UPDATE donhang
+            SET matrangthai_giaohang = ?, matrangthai_thanhtoan = ?
+            WHERE madonhang = ?
+        """, (shipping_status, payment_status, order_id))
+
+        connection.commit()
+        connection.close()
+
+        flash('Order status updated successfully!', 'success')
+        return redirect(url_for('view_order', order_id=order_id))
+
+    return render_template('view_order.html', order=order, order_details=order_details,
+                           shipping_statuses=shipping_statuses, payment_statuses=payment_statuses)
+
+@app.route('/admin/delete-order/<int:order_id>', methods=['POST'])
+def delete_order(order_id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE donhang SET isdelete = 1 WHERE madonhang = ?", order_id)
+    connection.commit()
+    connection.close()
+
+    flash('Order deleted successfully!', 'success')
+    return redirect(url_for('manage_orders'))
 
 @app.route('/admin/delete-category/<int:category_id>', methods=['POST'])
 def delete_category(category_id):
@@ -376,41 +459,171 @@ def delete_category(category_id):
 def manage_categories():
     # Lấy danh sách các loại sản phẩm từ cơ sở dữ liệu
     connection = get_db_connection()
-    cursor = connection.cursor()
+    cursor = connection.cursor()    
     cursor.execute("SELECT maloai, tenloai FROM loaidienthoai WHERE isdelete = 0")
     categories = cursor.fetchall()
     connection.close()
     
     return render_template('manage_categories.html', categories=categories)
-
-@app.route('/admin/manage-products', methods=['GET', 'POST'])
+@app.route('/admin/manage_products')
 def manage_products():
-    # Kết nối cơ sở dữ liệu và lấy danh sách sản phẩm
     connection = get_db_connection()
     cursor = connection.cursor()
-    cursor.execute("SELECT madt, tendienthoai, gia, hinhanh FROM dienthoai WHERE isdelete = 0")
+    cursor.execute("""
+        SELECT dt.madt, dt.tendienthoai, dt.mota, l.tenloai, dt.gia, dt.hinhanh
+        FROM dienthoai dt
+        JOIN loaidienthoai l ON dt.maloai = l.maloai
+        WHERE dt.isdelete = 0
+    """)
     products = cursor.fetchall()
     connection.close()
-    
     return render_template('manage_products.html', products=products)
+@app.route('/admin/add_product', methods=['GET', 'POST'])
+def add_product():
+    if request.method == 'POST':
+        # Get product details from the form
+        product_name = request.form['product_name']
+        description = request.form['description']
+        category = request.form['category']
+        price = request.form['price']
+        image = request.files.get('image')
 
-@app.route('/admin/manage_users')
-def manage_users():
-    # Kiểm tra nếu người dùng là admin
-    if not session.get('user_id') or session.get('role') != 'admin':
-        flash('You are not authorized to view this page', 'danger')
-        return redirect(url_for('index'))
+        # Handle image file upload
+        if image:
+            image_filename = image.filename
+            image.save(f"static/images/{image_filename}")  # Save image in the /static/images/ folder
+        else:
+            image_filename = 'default.jpg'  # default image if no image is uploaded
 
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        # Insert the new product into the database
+        cursor.execute("""
+            INSERT INTO dienthoai (tendienthoai, mota, maloai, gia, hinhanh) 
+            VALUES (?, ?, ?, ?, ?)
+        """, product_name, description, category, price, f'images/{image_filename}')
+        connection.commit()
+        connection.close()
+
+        flash('Product added successfully!', 'success')
+        return redirect(url_for('manage_products'))
+
+    # Fetch categories to display in the form
     connection = get_db_connection()
     cursor = connection.cursor()
+    cursor.execute("SELECT maloai, tenloai FROM loaidienthoai WHERE isdelete = 0")
+    categories = cursor.fetchall()
+    connection.close()
+    return render_template('add_product.html', categories=categories)
+@app.route('/admin/edit_product/<int:product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT madt, tendienthoai, mota, maloai, gia, hinhanh FROM dienthoai WHERE madt = ?", product_id)
+    product = cursor.fetchone()
 
+    if request.method == 'POST':
+        # Get the updated product details from the form
+        product_name = request.form['product_name']
+        description = request.form['description']
+        category = request.form['category']
+        price = request.form['price']
+        image = request.files.get('image')
+
+        # Handle image file upload
+        if image:
+            image_filename = image.filename
+            image.save(f"static/images/{image_filename}")  # Save image in the /static/images/ folder
+        else:
+            image_filename = product.hinhanh  # Keep existing image if none uploaded
+
+        # Update the product in the database
+        cursor.execute("""
+            UPDATE dienthoai 
+            SET tendienthoai = ?, mota = ?, maloai = ?, gia = ?, hinhanh = ?
+            WHERE madt = ?
+        """, product_name, description, category, price, f'images/{image_filename}', product_id)
+        connection.commit()
+        connection.close()
+
+        flash('Product updated successfully!', 'success')
+        return redirect(url_for('manage_products'))
+
+    cursor.execute("SELECT maloai, tenloai FROM loaidienthoai WHERE isdelete = 0")
+    categories = cursor.fetchall()
+    connection.close()
+
+    return render_template('edit_product.html', product=product, categories=categories)
+
+@app.route('/admin/delete_product/<int:product_id>', methods=['POST'])
+def delete_product(product_id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE dienthoai SET isdelete = 1 WHERE madt = ?", product_id)
+    connection.commit()
+    connection.close()
+    flash('Product deleted successfully!', 'success')
+    return redirect(url_for('manage_products'))
+@app.route('/admin/manage_users')
+def manage_users():
+    connection = get_db_connection()
+    cursor = connection.cursor()
     cursor.execute("SELECT mand, tennguoidung, email FROM nguoidung WHERE isdelete = 0")
     users = cursor.fetchall()
     connection.close()
-
+    
     return render_template('manage_users.html', users=users)
 
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+def delete_user(user_id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE nguoidung SET isdelete = 1 WHERE mand = ?", user_id)
+    connection.commit()
+    connection.close()
+    
+    flash('User deleted successfully!', 'success')
+    return redirect(url_for('manage_users'))
+
+@app.route('/admin/add_user', methods=['GET', 'POST'])
+def add_user():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO nguoidung (tennguoidung, email, matkhau) VALUES (?, ?, ?)", username, email, password)
+        connection.commit()
+        connection.close()
+        
+        flash('User added successfully!', 'success')
+        return redirect(url_for('manage_users'))
+    return render_template('add_user.html')
+
+@app.route('/admin/edit_user/<int:user_id>', methods=['GET', 'POST'])
+def edit_user(user_id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT tennguoidung, email FROM nguoidung WHERE mand = ?", user_id)
+    user = cursor.fetchone()
+    
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        
+        cursor.execute("UPDATE nguoidung SET tennguoidung = ?, email = ? WHERE mand = ?", username, email, user_id)
+        connection.commit()
+        connection.close()
+        
+        flash('User updated successfully!', 'success')
+        return redirect(url_for('manage_users'))
+    
+    connection.close()
+    return render_template('edit_user.html', user=user)
+
 
 def profile():
     user_id = session.get('user_id')

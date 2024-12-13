@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container py-5">
     <h1 class="text-center mb-5 display-4 fw-bold">Products</h1>
-    
+
     <div class="row">
         {% for product in products %}
         <div class="col-md-4">
@@ -20,6 +20,17 @@
                 </div>
                 <div class="card-img-wrapper">
                     <img src="{{ product.hinhanh }}" class="card-img-top product-img" alt="{{ product.tendienthoai }}">
+                    <div class="product-action">
+                        <a href="/product/{{ product.madt }}" class="action-btn">
+                            <i class="fas fa-search"></i>
+                        </a>
+                        <form action="{{ url_for('add_to_cart', product_id=product.madt) }}" method="POST" class="d-inline">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="action-btn add-to-cart">
+                                <i class="fas fa-shopping-cart"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
                 <div class="card-body text-center">
                     <h5 class="card-title text-truncate">{{ product.tendienthoai }}</h5>
@@ -36,14 +47,6 @@
                                 ${{ "{:,.0f}".format(product.gia).replace(',', '.') }}
                             </span>
                         {% endif %}
-                    </div>
-                    <div class="d-grid gap-2">
-                        <a href="/product/{{ product.madt }}" class="btn btn-primary btn-hover">
-                            <i class="fas fa-search me-2"></i>View Details
-                        </a>
-                        <button class="btn btn-outline-primary btn-hover add-to-cart">
-                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                        </button>
                     </div>
                 </div>
             </div>
@@ -70,16 +73,59 @@
     right: 10px;
     z-index: 2;
 }
-.btn-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+.product-action {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(41, 55, 240, 0.1);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.4s ease;
+}
+.action-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #2937f0;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+.action-btn:hover {
+    background: linear-gradient(45deg, #2937f0, #9f1ae2);
+    color: white;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(41, 55, 240, 0.3);
+}
+.card-img-wrapper:hover .product-action {
+    opacity: 1;
+    transform: translateY(0);
+}
+.card-img-wrapper:hover .product-img {
+    transform: scale(1.1);
 }
 .card-img-wrapper {
+    position: relative;
     overflow: hidden;
-    background: #f8f9fa;
+    background: linear-gradient(to bottom right, #f8f9fa, #ffffff);
+    border-radius: 1rem 1rem 0 0;
 }
 .price-wrapper {
     min-height: 24px;
+    font-size: 1.1rem;
 }
 </style>
 
