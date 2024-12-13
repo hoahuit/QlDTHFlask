@@ -43,7 +43,7 @@
                                     </label>
                                     <select name="shipping_status" id="shipping_status" class="form-select">
                                         {% for status in shipping_statuses %}
-                                            <option value="{{ status[0] }}" {% if status[0] == order[5] %}selected{% endif %}>
+                                            <option value="{{ status[0] }}" {% if status[0]|string == order[5]|string %}selected{% endif %}>
                                                 {{ status[1] }}
                                             </option>
                                         {% endfor %}
@@ -57,7 +57,7 @@
                                     </label>
                                     <select name="payment_status" id="payment_status" class="form-select">
                                         {% for status in payment_statuses %}
-                                            <option value="{{ status[0] }}" {% if status[0] == order[4] %}selected{% endif %}>
+                                            <option value="{{ status[0] }}" {% if status[0]|string == order[4]|string %}selected{% endif %}>
                                                 {{ status[1] }}
                                             </option>
                                         {% endfor %}

@@ -376,6 +376,87 @@ def manage_orders():
     connection.close()
 
     return render_template('manage_orders.html', orders=orders)
+
+@app.route('/admin/manage-blogs', methods=['GET'])
+def manage_blogs():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    
+    cursor.execute("SELECT mablog, tieude, LEFT(noidung, 200) AS noidung, ngaydang FROM blog WHERE isdelete = 0")
+    blogs = cursor.fetchall()
+    connection.close()
+
+    return render_template('manage_blogs.html', blogs=blogs)
+
+# Route to add a new blog
+@app.route('/admin/add-blog', methods=['GET', 'POST'])
+def add_blog():
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor()
+            cursor.execute("""
+                INSERT INTO blog (tieude, noidung)
+                VALUES (?, ?)
+            """, title, content)
+            connection.commit()
+            connection.close()
+
+            flash('Blog added successfully!', 'success')
+            return redirect(url_for('manage_blogs'))
+        except Exception as e:
+            flash(f'An error occurred: {str(e)}', 'danger')
+
+    return render_template('add_blog.html')
+
+# Route to edit a blog
+@app.route('/admin/edit-blog/<int:blog_id>', methods=['GET', 'POST'])
+def edit_blog(blog_id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT tieude, noidung FROM blog WHERE mablog = ?", (blog_id,))
+    blog = cursor.fetchone()
+
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+
+        try:
+            cursor.execute("""
+                UPDATE blog 
+                SET tieude = ?, noidung = ? 
+                WHERE mablog = ?
+            """, (title, content, blog_id))
+            connection.commit()
+            connection.close()
+
+            flash('Blog updated successfully!', 'success')
+            return redirect(url_for('manage_blogs'))
+        except Exception as e:
+            flash(f'An error occurred: {str(e)}', 'danger')
+
+    connection.close()
+    return render_template('edit_blog.html', blog=blog)
+
+# Route to delete a blog
+@app.route('/admin/delete-blog/<int:blog_id>', methods=['POST'])
+def delete_blog(blog_id):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute("UPDATE blog SET isdelete = 1 WHERE mablog = ?", (blog_id,))
+        connection.commit()
+        connection.close()
+
+        flash('Blog deleted successfully!', 'success')
+    except Exception as e:
+        flash(f'An error occurred: {str(e)}', 'danger')
+    
+    return redirect(url_for('manage_blogs'))
+
 @app.route('/admin/view-order/<int:order_id>', methods=['GET', 'POST'])
 def view_order(order_id):
     connection = get_db_connection()
@@ -383,21 +464,19 @@ def view_order(order_id):
 
     # Fetch order and details
     cursor.execute("""
-        SELECT d.madonhang, n.tennguoidung, n.email, d.tongtien, d.phuongthucthanhtoan, 
-               tg.tentrangthai AS trangthai_giaohang, dt.tentrangthai AS trangthai_thanhtoan
+        SELECT d.madonhang, n.tennguoidung, n.email, d.tongtien, d.matrangthai_thanhtoan, 
+               d.matrangthai_giaohang  
         FROM donhang d
         JOIN nguoidung n ON d.mand = n.mand
-        JOIN trangthai_giaohang tg ON d.matrangthai_giaohang = tg.matrangthai
-        JOIN trangthai_thanhtoan dt ON d.matrangthai_thanhtoan = dt.matrangthai
         WHERE d.madonhang = ?
     """, (order_id,))
     order = cursor.fetchone()
 
     cursor.execute("""
-        SELECT c.soluong, c.dongia, p.tendienthoai
-        FROM chitietdonhang c
-        JOIN dienthoai p ON c.madt = p.madt
-        WHERE c.madonhang = ?
+            SELECT c.soluong, c.dongia, p.tendienthoai
+            FROM chitietdonhang c
+            JOIN dienthoai p ON c.madt = p.madt
+            WHERE c.madonhang = ?
     """, (order_id,))
     order_details = cursor.fetchall()
 
@@ -624,7 +703,7 @@ def edit_user(user_id):
     connection.close()
     return render_template('edit_user.html', user=user)
 
-
+@app.route('/profile')
 def profile():
     user_id = session.get('user_id')
     if not user_id:

@@ -1,0 +1,62 @@
+{% extends "baseadmin.html" %}
+
+{% block content %}
+<div class="container-fluid px-4 py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h2 class="fw-bold text-primary">
+                <i class="fas fa-edit me-2"></i>Edit Blog Post
+            </h2>
+            <p class="text-muted">Update your blog article content</p>
+        </div>
+    </div>
+
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-body p-4">
+            <form method="POST">
+                <div class="mb-4">
+                    <label for="title" class="form-label fw-semibold">Blog Title</label>
+                    <input type="text" 
+                           class="form-control form-control-lg" 
+                           id="title" 
+                           name="title" 
+                           value="{{ blog[0] }}"
+                           placeholder="Enter blog title"
+                           required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="content" class="form-label fw-semibold">Blog Content</label>
+                    <textarea class="form-control" 
+                              id="content" 
+                              name="content" 
+                              rows="10" 
+                              placeholder="Write your blog content here..."
+                              required>{{ blog[1] }}</textarea>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <a href="/manage-blogs" class="btn btn-light me-2">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Update Blog
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s;
+    }
+</style>
+{% endblock %}
