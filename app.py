@@ -5,14 +5,12 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Thay 'your_secret_key' bằng chuỗi bất kỳ
 # Kết nối cơ sở dữ liệu
 def get_db_connection():
-    connection = pyodbc.connect('DRIVER={SQL Server};SERVER=minhhoa;DATABASE=quanlybandienthoai;UID=sa;PWD=123')
+    connection = pyodbc.connect('DRIVER={SQL Server};SERVER=THLONE\SQLEXPRESS;DATABASE=quanlybandienthoai;Trusted_Connection=yes')
     return connection
-
-
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if 'cart' not in session or not session['cart']:
-        return redirect(url_for('cart'))
+        return redirect(url_for('cart'))  # Redirect to cart if no items
 
     cart = session['cart']
     total = sum(item['price'] * item['quantity'] for item in cart)
@@ -21,73 +19,93 @@ def checkout():
     user_id = session.get('user_id')
     if not user_id:
         flash('You need to be logged in to checkout!', 'danger')
-        return redirect(url_for('login'))  # Redirect đến trang đăng nhập nếu chưa đăng nhập
+        return redirect(url_for('login'))  # Redirect to login if not logged in
 
-    # Xử lý form thanh toán
     if request.method == 'POST':
-        # Lấy phương thức thanh toán từ form
-        payment_method = request.form.get('payment_method')  # Tiền mặt hoặc Online Banking
-        address = request.form.get('shipping_address')  # Địa chỉ giao hàng
+        # Lấy phương thức thanh toán và địa chỉ giao hàng từ form
+        payment_method = request.form.get('payment_method')
+        shipping_address = request.form.get('shipping_address')
 
-        # Kết nối cơ sở dữ liệu và thêm thông tin vào bảng donhang
-        connection = get_db_connection()
-        cursor = connection.cursor()
+        if not payment_method or not shipping_address:
+            flash('Please fill in all the required fields.', 'danger')
+            return redirect(url_for('checkout'))  # Redirect back to checkout if any field is missing
 
-        # Giả sử người dùng đã đăng nhập và có ID
-        user_id = session.get('user_id')  # Lấy ID người dùng từ session
+        # Xử lý dữ liệu thanh toán và lưu vào cơ sở dữ liệu (donhang, chitietdonhang)
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor()
 
-        # Lấy ID trạng thái giao hàng "Chưa giao"
-        cursor.execute("SELECT matrangthai FROM trangthai_giaohang WHERE tentrangthai = 'Chưa giao'")
-        shipping_status = cursor.fetchone()
-        if shipping_status is None:
-            flash('Shipping status "Chưa giao" not found in database.', 'danger')
-            return redirect(url_for('cart'))
-        shipping_status_id = shipping_status[0]
-
-        # Lấy ID trạng thái thanh toán (Tiền mặt hoặc Online Banking)
-        cursor.execute("SELECT matrangthai FROM trangthai_thanhtoan WHERE tentrangthai = ?", payment_method)
-        payment_status = cursor.fetchone()
-        if payment_status is None:
-            flash(f'Payment method "{payment_method}" not found in database.', 'danger')
-            return redirect(url_for('cart'))
-        payment_status_id = payment_status[0]
-
-        # Tạo hóa đơn mới
-        cursor.execute("""
-            INSERT INTO donhang (mand, tongtien, diachigiaohang, matrangthai_giaohang, matrangthai_thanhtoan, phuongthucthanhtoan)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, user_id, total, address, shipping_status_id, payment_status_id, payment_method)
-        connection.commit()
-
-        # Lấy ID của đơn hàng vừa thêm
-        cursor.execute("SELECT @@IDENTITY AS madonhang")
-        order_id = cursor.fetchone()[0]
-
-        # Thêm các chi tiết đơn hàng vào bảng chitietdonhang
-        for item in cart:
+            # Thêm dữ liệu vào bảng donhang
             cursor.execute("""
-                INSERT INTO chitietdonhang (madt, madonhang, soluong, dongia)
-                VALUES (?, ?, ?, ?)
-            """, item['id'], order_id, item['quantity'], item['price'])
-        
-        connection.commit()
+                INSERT INTO donhang (mand, tongtien, diachigiaohang, matrangthai_giaohang, matrangthai_thanhtoan, phuongthucthanhtoan)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, user_id, total, shipping_address, 1, 1, payment_method)  # Giả sử trạng thái giao hàng và thanh toán mặc định là 1
+            connection.commit()
 
-        # Xóa giỏ hàng sau khi thanh toán
-        session.pop('cart', None)
+            # Lấy ID của đơn hàng vừa thêm
+            cursor.execute("SELECT @@IDENTITY AS madonhang")
+            order_id = cursor.fetchone()[0]
 
-        # Thông báo cho người dùng
-        flash('Your order has been successfully placed!', 'success')
-        return redirect(url_for('order_summary', order_id=order_id))
+            # Thêm các chi tiết đơn hàng vào bảng chitietdonhang
+            for item in cart:
+                cursor.execute("""
+                    INSERT INTO chitietdonhang (madt, madonhang, soluong, dongia)
+                    VALUES (?, ?, ?, ?)
+                """, item['id'], order_id, item['quantity'], item['price'])
+            
+            connection.commit()
 
-    # Nếu là GET request, hiển thị trang thanh toán
+            # Xóa giỏ hàng sau khi thanh toán
+            session.pop('cart', None)
+
+            # Thông báo thành công
+            flash('Your order has been successfully placed!', 'success')
+            return redirect(url_for('order_summary', order_id=order_id))  # Chuyển hướng đến trang tóm tắt đơn hàng
+
+        except Exception as e:
+            # Xử lý lỗi nếu có
+            connection.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+            return redirect(url_for('cart'))  # Nếu có lỗi, quay lại trang giỏ hàng
+
     return render_template('checkout.html', total=total)
+@app.route('/track_order', methods=['GET'])
+def track_order():
+    # Lấy user_id từ session (giả sử người dùng đã đăng nhập)
+    user_id = session.get('user_id')
 
-# Trang tóm tắt đơn hàng
+    if not user_id:
+        flash('You need to be logged in to track your orders.', 'danger')
+        return redirect(url_for('login'))  # Redirect to login page if not logged in
+
+    # Kết nối đến cơ sở dữ liệu và lấy tất cả đơn hàng của user_id
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Truy vấn tất cả các đơn hàng của người dùng
+    cursor.execute("""
+        SELECT d.madonhang, d.ngaydat, d.tongtien, dt.tentrangthai AS trangthai_thanhtoan, sg.tentrangthai AS trangthai_giaohang
+        FROM donhang d
+        JOIN trangthai_thanhtoan dt ON d.matrangthai_thanhtoan = dt.matrangthai
+        JOIN trangthai_giaohang sg ON d.matrangthai_giaohang = sg.matrangthai
+        WHERE d.mand = ?  -- Chỉ lấy các đơn hàng của người dùng hiện tại
+    """, (user_id,))
+    orders = cursor.fetchall()
+    connection.close()
+
+    # Nếu không có đơn hàng nào
+    if not orders:
+        flash('You don\'t have any orders yet.', 'info')
+
+    # Render lại trang theo dõi đơn hàng với danh sách các đơn hàng
+    return render_template('tracking.html', orders=orders)
+
 @app.route('/order_summary/<int:order_id>')
 def order_summary(order_id):
     # Lấy thông tin đơn hàng từ cơ sở dữ liệu
     connection = get_db_connection()
     cursor = connection.cursor()
+
     cursor.execute("""
         SELECT d.madonhang, d.ngaydat, d.tongtien, d.phuongthucthanhtoan, dt.tentrangthai AS trangthai_thanhtoan
         FROM donhang d
@@ -97,7 +115,7 @@ def order_summary(order_id):
     order = cursor.fetchone()
 
     cursor.execute("""
-        SELECT c.soluong, c.dongia, p.tendienthoai
+        SELECT c.soluong, c.dongia, p.tendienthoai, p.hinhanh
         FROM chitietdonhang c
         JOIN dienthoai p ON c.madt = p.madt
         WHERE c.madonhang = ?
@@ -106,7 +124,14 @@ def order_summary(order_id):
 
     connection.close()
 
+    # Kiểm tra nếu đơn hàng không tồn tại
+    if order is None:
+        flash('Order not found!', 'danger')
+        return redirect(url_for('index'))  # Redirect về trang chính nếu đơn hàng không tồn tại
+
     return render_template('order_summary.html', order=order, order_details=order_details)
+
+
 @app.route('/add-to-cart/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
     quantity = int(request.form.get('quantity', 1))  # Chuyển đổi số lượng sang kiểu int

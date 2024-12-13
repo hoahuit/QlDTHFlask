@@ -32,43 +32,158 @@
         footer {
             margin-top: auto !important;
         }
-        /* Navbar Styles */
+        /* Updated Navbar Styles */
         .navbar {
-            background: linear-gradient(45deg, #1a237e, #0d47a1) !important;
-            padding: 1rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #2b32b2, #1488cc) !important;
+            padding: 0.8rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
         }
 
         .navbar-brand {
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 1.6rem;
+            font-weight: 600;
             color: #fff !important;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             transition: all 0.3s ease;
         }
 
         .navbar-brand:hover {
-            transform: scale(1.05);
-            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            transform: translateY(-1px);
+            text-shadow: 0 0 15px rgba(255,255,255,0.4);
         }
 
         .nav-link {
             font-weight: 500;
-            text-transform: uppercase;
-            padding: 0.5rem 1rem !important;
-            margin: 0 0.2rem;
-            border-radius: 5px;
+            font-size: 0.95rem;
+            padding: 0.7rem 1.2rem !important;
+            margin: 0 0.3rem;
+            border-radius: 25px;
             transition: all 0.3s ease;
+            position: relative;
+            color: rgba(255,255,255,0.9) !important;
         }
 
         .nav-link:hover {
-            background-color: rgba(255,255,255,0.1);
-            transform: translateY(-2px);
+            color: #fff !important;
+            background-color: rgba(255,255,255,0.15);
+            transform: translateY(-1px);
         }
 
         .nav-link.active {
             background-color: rgba(255,255,255,0.2);
+            color: #fff !important;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #fff;
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+            opacity: 0;
+        }
+
+        .nav-link:hover::after {
+            width: 50%;
+            opacity: 1;
+        }
+
+        /* Updated Top Bar Styles */
+        .top-bar {
+            background: rgba(0,0,0,0.03);
+            padding: 6px 0;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .top-bar-contact {
+            color: #666;
+        }
+
+        .top-bar-contact i {
+            color: #1488cc;
+            margin-right: 5px;
+        }
+
+        .top-bar-social a {
+            color: #666;
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+
+        .top-bar-social a:hover {
+            color: #1488cc;
+            transform: translateY(-1px);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.4rem;
+            }
+
+            .nav-link {
+                padding: 0.5rem 1rem !important;
+                margin: 0.2rem 0;
+            }
+        }
+
+        /* Navbar Toggle Button */
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+            outline: none;
+        }
+
+        .navbar-toggler-icon {
+            width: 24px;
+            height: 24px;
+            background-image: none;
+            position: relative;
+            border-bottom: 2px solid #fff;
+            transition: all 300ms linear;
+        }
+
+        .navbar-toggler-icon:after, 
+        .navbar-toggler-icon:before {
+            width: 24px;
+            position: absolute;
+            height: 2px;
+            background-color: #fff;
+            top: 0;
+            left: 0;
+            content: '';
+            z-index: 2;
+            transition: all 300ms linear;
+        }
+
+        .navbar-toggler-icon:after {
+            top: 8px;
+        }
+
+        .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon:after {
+            transform: rotate(45deg);
+            background-color: #fff;
+            height: 2px;
+        }
+
+        .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+            border-color: transparent;
+        }
+
+        .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon:before {
+            transform: translateY(8px) rotate(-45deg);
+            background-color: #fff;
+            height: 2px;
         }
 
         /* Categories Panel */
@@ -261,11 +376,134 @@
         .hover-zoom:hover img {
             transform: scale(1.1);
         }
+
+        /* Carousel Styles */
+        .carousel-item {
+            height: 500px;
+            background-position: center;
+            background-size: cover;
+            position: relative;
+        }
+
+        .carousel-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            color: white;
+        }
+
+        .carousel-content h2 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 1rem;
+        }
+
+        .carousel-content p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Enhanced Header Styles */
+        .top-bar {
+            background: #0a1647;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .top-bar-contact {
+            color: #fff;
+        }
+
+        .top-bar-social a {
+            color: #fff;
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+
+        .top-bar-social a:hover {
+            color: #4CAF50;
+        }
+
+        /* Enhanced Footer Styles */
+        .footer-content {
+            padding: 4rem 0 2rem;
+        }
+
+        .footer-heading {
+            color: #fff;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background: #4CAF50;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #4CAF50;
+            padding-left: 10px;
+        }
+
+        .footer-bottom {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body>
     <!-- Loading Animation -->
     <div class="loading"></div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 top-bar-contact">
+                    <i class="fas fa-phone-alt me-2"></i> +1 234 567 890
+                    <i class="fas fa-envelope ms-3 me-2"></i> info@phonestore.com
+                </div>
+                <div class="col-md-6 text-end top-bar-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -281,28 +519,80 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="/"><i class="fas fa-home me-1"></i>Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/cart"><i class="fas fa-shopping-cart me-1"></i>Cart</a>
-                    </li>
+           
+           
+                    
                     {% if session.get('user_id') %}
                 <li class="nav-item">
                     <a class="nav-link" href="#"><i class="fas fa-user me-1"></i>Hello, {{ session.get('username') }}</a>
+                </li>
+     
+                <li class="nav-item">
+                    <a class="nav-link" href="/cart"><i class="fas fa-shopping-cart me-1"></i>Cart</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/track_order"><i class="fas fa-search me-1"></i>Track Order</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="/register"><i class="fas fa-user-plus me-1"></i>Register</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/register"><i class="fas fa-user-plus me-1"></i>Register</a>
+                </li>
+        
                 {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- Hero Carousel -->
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active" style="background-image: url('https://images.unsplash.com/photo-1616348436168-de43ad0db179?ixlib=rb-4.0.3');">
+                <div class="carousel-overlay">
+                    <div class="carousel-content">
+                        <h2>Latest Smartphones</h2>
+                        <p>Discover the newest technology and innovations in mobile devices</p>
+                        <a href="/products" class="btn btn-lg btn-custom">Shop Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item" style="background-image: url('https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?ixlib=rb-4.0.3');">
+                <div class="carousel-overlay">
+                    <div class="carousel-content">
+                        <h2>Special Offers</h2>
+                        <p>Get amazing deals on premium smartphones</p>
+                        <a href="/offers" class="btn btn-lg btn-custom">View Offers</a>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item" style="background-image: url('https://images.unsplash.com/photo-1565849904461-04a58ad377e0?ixlib=rb-4.0.3');">
+                <div class="carousel-overlay">
+                    <div class="carousel-content">
+                        <h2>Accessories Collection</h2>
+                        <p>Complete your mobile experience with our premium accessories</p>
+                        <a href="/accessories" class="btn btn-lg btn-custom">Explore More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
 
     <!-- Main Content -->
     <div class="container mt-4">
@@ -334,14 +624,37 @@
     </div>
 
     <!-- Footer -->
-    <footer class="text-white text-center py-3 mt-4">
-        <div class="container">
-            <p>&copy; 2024 Phone Store. All rights reserved.</p>
-            <div class="mt-3">
-                <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+    <footer class="text-white">
+        <div class="footer-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h5 class="footer-heading">About Us</h5>
+                        <p>Phone Store is your trusted destination for the latest smartphones and accessories. We provide quality products with excellent customer service.</p>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <h5 class="footer-heading">Quick Links</h5>
+                        <ul class="footer-links">
+                            <li><a href="/about">About Us</a></li>
+                            <li><a href="/contact">Contact Us</a></li>
+                            <li><a href="/privacy">Privacy Policy</a></li>
+                            <li><a href="/terms">Terms & Conditions</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <h5 class="footer-heading">Contact Info</h5>
+                        <ul class="footer-links">
+                            <li><i class="fas fa-map-marker-alt me-2"></i> 123 Store Street, City, Country</li>
+                            <li><i class="fas fa-phone-alt me-2"></i> +1 234 567 890</li>
+                            <li><i class="fas fa-envelope me-2"></i> info@phonestore.com</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom text-center py-3">
+            <div class="container">
+                <p class="mb-0">&copy; 2024 Phone Store. All rights reserved.</p>
             </div>
         </div>
     </footer>
