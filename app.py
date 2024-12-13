@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Thay 'your_secret_key' bằng chuỗi bất kỳ
 # Kết nối cơ sở dữ liệu
 def get_db_connection():
-    connection = pyodbc.connect('DRIVER={SQL Server};SERVER=minhhoa;DATABASE=quanlybandienthoai;Trusted_Connection=yes')
+    connection = pyodbc.connect('DRIVER={SQL Server};SERVER=THLONE\SQLEXPRESS;DATABASE=quanlybandienthoai;Trusted_Connection=yes')
     return connection
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
@@ -502,7 +502,7 @@ def add_product():
         cursor.execute("""
             INSERT INTO dienthoai (tendienthoai, mota, maloai, gia, hinhanh) 
             VALUES (?, ?, ?, ?, ?)
-        """, product_name, description, category, price, f'images/{image_filename}')
+        """, product_name, description, category, price, f'/static/images/{image_filename}')
         connection.commit()
         connection.close()
 
@@ -543,7 +543,7 @@ def edit_product(product_id):
             UPDATE dienthoai 
             SET tendienthoai = ?, mota = ?, maloai = ?, gia = ?, hinhanh = ?
             WHERE madt = ?
-        """, product_name, description, category, price, f'images/{image_filename}', product_id)
+        """, product_name, description, category, price, f'/static/images/{image_filename}', product_id)
         connection.commit()
         connection.close()
 

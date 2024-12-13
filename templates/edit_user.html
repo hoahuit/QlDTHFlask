@@ -3,16 +3,72 @@
 {% block title %}Edit User{% endblock %}
 
 {% block content %}
-<h3>Edit User</h3>
-<form method="POST">
-    <div class="mb-3">
-        <label for="username" class="form-label">Name</label>
-        <input type="text" class="form-control" name="username" value="{{ user[0] }}" required>
+<div class="container-fluid px-4 py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col text-center">
+            <h2 class="fw-bold text-primary">
+                <i class="fas fa-user-edit me-2"></i>Edit User
+            </h2>
+            <p class="text-muted">Update user information</p>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" name="email" value="{{ user[1] }}" required>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label for="username" class="form-label fw-bold">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control" name="username" id="username"
+                                       value="{{ user[0] }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-bold">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input type="email" class="form-control" name="email" id="email"
+                                       value="{{ user[1] }}" required>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="fas fa-save me-2"></i>Update User
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <button type="submit" class="btn btn-warning">Update User</button>
-</form>
+</div>
+
+<style>
+    .input-group-text {
+        border: none;
+    }
+    
+    .form-control {
+        border-left: none;
+    }
+    
+    .form-control:focus {
+        border-color: #dee2e6;
+        box-shadow: none;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s;
+    }
+</style>
 {% endblock %}

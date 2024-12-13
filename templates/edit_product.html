@@ -1,37 +1,121 @@
 {% extends "baseadmin.html" %}
 
+{% block title %}Edit Product{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h3>Edit Product</h3>
-    <form method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="product_name" class="form-label">Product Name</label>
-            <input type="text" class="form-control" id="product_name" name="product_name" value="{{ product[1] }}" required>
+<div class="container-fluid px-4 py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col text-center">
+            <h2 class="fw-bold text-primary">
+                <i class="fas fa-edit me-2"></i>Edit Product
+            </h2>
+            <p class="text-muted">Update product information</p>
         </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="4" required>{{ product[2] }}</textarea>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="product_name" class="form-label fw-bold">Product Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="product_name" name="product_name" 
+                                           value="{{ product[1] }}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="category" class="form-label fw-bold">Category</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-tag"></i>
+                                    </span>
+                                    <select class="form-select" id="category" name="category" required>
+                                        {% for category in categories %}
+                                            <option value="{{ category[0] }}" {% if category[0] == product[3] %}selected{% endif %}>
+                                                {{ category[1] }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-bold">Description</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-align-left"></i>
+                                </span>
+                                <textarea class="form-control" id="description" name="description" 
+                                          rows="4" required>{{ product[2] }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="price" class="form-label fw-bold">Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </span>
+                                    <input type="number" class="form-control" id="price" name="price" 
+                                           step="0.01" value="{{ product[4] }}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="image" class="form-label fw-bold">Product Image</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-image"></i>
+                                    </span>
+                                    <input type="file" class="form-control" id="image" name="image">
+                                </div>
+                                {% if product[5] %}
+                                <div class="mt-2">
+                                    <p class="mb-1 text-muted">Current Image:</p>
+                                    <img src="{{ product[5] }}" alt="Product Image" class="img-thumbnail" style="height: 100px; object-fit: contain;">
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="fas fa-save me-2"></i>Update Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="category" class="form-label">Category</label>
-            <select class="form-control" id="category" name="category" required>
-                {% for category in categories %}
-                    <option value="{{ category[0] }}" {% if category[0] == product[3] %}selected{% endif %}>{{ category[1] }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="price" class="form-label">Price</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" value="{{ product[4] }}" required>
-        </div>
-        <div class="mb-3">
-            <label for="image" class="form-label">Product Image</label>
-            <input type="file" class="form-control" id="image" name="image">
-            {% if product[5] %}
-                <p>Current Image: <img src="{{ product[5] }}" alt="Product Image" width="100"></p>
-            {% endif %}
-        </div>
-        <button type="submit" class="btn btn-primary">Update Product</button>
-    </form>
+    </div>
 </div>
+
+<style>
+    .input-group-text {
+        border: none;
+    }
+    
+    .form-control, .form-select {
+        border-left: none;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #dee2e6;
+        box-shadow: none;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s;
+    }
+</style>
 {% endblock %}

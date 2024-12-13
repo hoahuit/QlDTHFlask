@@ -1,45 +1,114 @@
 {% extends "baseadmin.html" %}
 
 {% block content %}
-<div class="container">
-    <h3>View Order Details</h3>
-    <p><strong>Order ID:</strong> {{ order[0] }}</p>
-    <p><strong>Customer Name:</strong> {{ order[1] }}</p>
-    <p><strong>Email:</strong> {{ order[2] }}</p>
-    <p><strong>Total Amount:</strong> {{ order[3] }}</p>
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow-lg rounded-3 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h3 class="mb-0">
+                        <i class="fas fa-file-invoice me-2"></i>Order Details
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="text-muted mb-1">Order ID</label>
+                                <h5 class="fw-bold">#{{ order[0] }}</h5>
+                            </div>
+                            <div class="mb-3">
+                                <label class="text-muted mb-1">Customer Name</label>
+                                <h5 class="fw-bold">{{ order[1] }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="text-muted mb-1">Email</label>
+                                <h5 class="fw-bold">{{ order[2] }}</h5>
+                            </div>
+                            <div class="mb-3">
+                                <label class="text-muted mb-1">Total Amount</label>
+                                <h5 class="fw-bold text-success">{{ "{:,.0f}".format(order[3]).replace(',','.') }}₫</h5>
+                            </div>
+                        </div>
+                    </div>
 
-    <h4>Order Status</h4>
-    <form method="POST">
-        <div class="mb-3">
-            <label for="shipping_status" class="form-label">Shipping Status</label>
-            <select name="shipping_status" id="shipping_status" class="form-control">
-                {% for status in shipping_statuses %}
-                    <option value="{{ status[0] }}" {% if status[0] == order[5] %}selected{% endif %}>
-                        {{ status[1] }}
-                    </option>
-                {% endfor %}
-            </select>
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="shipping_status" class="form-label fw-bold">
+                                        <i class="fas fa-truck me-2"></i>Shipping Status
+                                    </label>
+                                    <select name="shipping_status" id="shipping_status" class="form-select">
+                                        {% for status in shipping_statuses %}
+                                            <option value="{{ status[0] }}" {% if status[0] == order[5] %}selected{% endif %}>
+                                                {{ status[1] }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="payment_status" class="form-label fw-bold">
+                                        <i class="fas fa-credit-card me-2"></i>Payment Status
+                                    </label>
+                                    <select name="payment_status" id="payment_status" class="form-select">
+                                        {% for status in payment_statuses %}
+                                            <option value="{{ status[0] }}" {% if status[0] == order[4] %}selected{% endif %}>
+                                                {{ status[1] }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary btn-lg px-4">
+                                <i class="fas fa-save me-2"></i>Update Status
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-lg rounded-3">
+                <div class="card-header bg-white py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-shopping-basket me-2"></i>Order Items
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order_details %}
+                                    <tr>
+                                        <td>{{ item[2] }}</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-light text-dark rounded-pill px-3">
+                                                {{ item[0] }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end fw-bold">{{ "{:,.0f}".format(item[1]).replace(',','.') }}₫</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="mb-3">
-            <label for="payment_status" class="form-label">Payment Status</label>
-            <select name="payment_status" id="payment_status" class="form-control">
-                {% for status in payment_statuses %}
-                    <option value="{{ status[0] }}" {% if status[0] == order[4] %}selected{% endif %}>
-                        {{ status[1] }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Update Status</button>
-    </form>
-
-    <h4>Order Items</h4>
-    <ul>
-        {% for item in order_details %}
-            <li>{{ item[2] }} ({{ item[0] }} x {{ item[1] }})</li>
-        {% endfor %}
-    </ul>
+    </div>
 </div>
 {% endblock %}

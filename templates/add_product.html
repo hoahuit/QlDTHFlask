@@ -1,34 +1,113 @@
 {% extends "baseadmin.html" %}
 
 {% block content %}
-<div class="container">
-    <h3>Add New Product</h3>
-    <form method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="product_name" class="form-label">Product Name</label>
-            <input type="text" class="form-control" id="product_name" name="product_name" required>
+<div class="container-fluid px-4 py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h2 class="fw-bold text-primary">
+                <i class="fas fa-box-open me-2"></i>Add New Product
+            </h2>
+            <p class="text-muted">Create a new product listing</p>
         </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="product_name" class="form-label fw-bold">Product Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="product_name" name="product_name" 
+                                           placeholder="Enter product name" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="category" class="form-label fw-bold">Category</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-tags"></i>
+                                    </span>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="" disabled selected>Select a category</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category[0] }}">{{ category[1] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-bold">Description</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-align-left"></i>
+                                </span>
+                                <textarea class="form-control" id="description" name="description" 
+                                          rows="4" placeholder="Enter product description" required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="price" class="form-label fw-bold">Price ($)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </span>
+                                    <input type="number" class="form-control" id="price" name="price" 
+                                           step="0.01" placeholder="Enter price" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="image" class="form-label fw-bold">Product Image</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-image"></i>
+                                    </span>
+                                    <input type="file" class="form-control" id="image" name="image"
+                                           accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus-circle me-2"></i>Add Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="category" class="form-label">Category</label>
-            <select class="form-control" id="category" name="category" required>
-                {% for category in categories %}
-                    <option value="{{ category[0] }}">{{ category[1] }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="price" class="form-label">Price</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-        </div>
-        <div class="mb-3">
-            <label for="image" class="form-label">Product Image</label>
-            <input type="file" class="form-control" id="image" name="image">
-        </div>
-        <button type="submit" class="btn btn-primary">Add Product</button>
-    </form>
+    </div>
 </div>
+
+<style>
+    .input-group-text {
+        border: none;
+    }
+    
+    .form-control, .form-select {
+        border-left: none;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #dee2e6;
+        box-shadow: none;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s;
+    }
+</style>
 {% endblock %}
