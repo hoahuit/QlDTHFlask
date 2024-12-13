@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Blogs{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="text-center mb-5">
+                    <i class="fas fa-blog me-2"></i>Latest Blog Posts
+                </h1>
+
+                {% if blogs %}
+                    <div class="row">
+                        {% for blog in blogs %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100 shadow-sm hover-effect">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">
+                                            {{ blog.tieude }}
+                                        </h5>
+                                        <p class="card-text text-muted">
+                                            {{ blog.noidung[:150] }}...
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="far fa-calendar-alt me-1"></i>
+                                                {{ blog.ngaydang }}
+                                            </small>
+                                            <a href="{{ url_for('blog_detail', blog_id=blog.mablog) }}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                Read More
+                                                <i class="fas fa-arrow-right ms-1"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                        <p class="lead">No blog posts available at the moment.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .hover-effect {
+            transition: transform 0.3s ease;
+        }
+        .hover-effect:hover {
+            transform: translateY(-5px);
+        }
+        .card {
+            border-radius: 10px;
+            border: none;
+        }
+        .card-title {
+            font-weight: 600;
+        }
+    </style>
+{% endblock %}

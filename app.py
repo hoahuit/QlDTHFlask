@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Thay 'your_secret_key' bằng chuỗi bất kỳ
 # Kết nối cơ sở dữ liệu
 def get_db_connection():
-    connection = pyodbc.connect('DRIVER={SQL Server};SERVER=minhhoa;DATABASE=quanlybandienthoai;Trusted_Connection=yes')
+    connection = pyodbc.connect('DRIVER={SQL Server};SERVER=THLONE\SQLEXPRESS;DATABASE=quanlybandienthoai;Trusted_Connection=yes')
     return connection
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
@@ -99,31 +99,34 @@ def track_order():
 
     # Render lại trang theo dõi đơn hàng với danh sách các đơn hàng
     return render_template('tracking.html', orders=orders)
-@app.route('/blog')
-def blog():
+# Route to view all blogs
+@app.route('/blogs')
+def blogs():
     connection = get_db_connection()
     cursor = connection.cursor()
-
-    # Truy vấn lấy tất cả bài viết blog chưa bị xóa
-    cursor.execute("SELECT mablog, tieude, ngaydang FROM blog WHERE isdelete = 0 ORDER BY ngaydang DESC")
+    
+    # Get all blogs that are not deleted (isdelete = 0)
+    cursor.execute("SELECT mablog, tieude, LEFT(noidung, 200) AS noidung, ngaydang FROM blog WHERE isdelete = 0")
     blogs = cursor.fetchall()
     connection.close()
 
-    return render_template('blog.html', blogs=blogs)
+    return render_template('blogs.html', blogs=blogs)
+
+# Route to view a specific blog detail
 @app.route('/blog/<int:blog_id>')
 def blog_detail(blog_id):
     connection = get_db_connection()
     cursor = connection.cursor()
 
-    # Truy vấn lấy thông tin chi tiết của bài viết
-    cursor.execute("SELECT * FROM blog WHERE mablog = ? AND isdelete = 0", blog_id)
+    # Get the blog based on blog_id
+    cursor.execute("SELECT mablog, tieude, noidung, ngaydang FROM blog WHERE mablog = ? AND isdelete = 0", blog_id)
     blog = cursor.fetchone()
     connection.close()
 
-    if not blog:
+    if blog is None:
         flash('Blog not found!', 'danger')
-        return redirect(url_for('blog'))  # Redirect về trang blog nếu bài viết không tồn tại
-
+        return redirect(url_for('blogs'))  # Redirect to blog list if blog is not found
+    
     return render_template('blog_detail.html', blog=blog)
 
 @app.route('/order_summary/<int:order_id>')
