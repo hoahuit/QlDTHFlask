@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Blog Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">{{ blog.tieude }}</h1>
+    
+    <div class="card shadow-lg rounded-3">
+        <div class="card-body">
+            <p class="text-muted">Published on: {{ blog.ngaydang }}</p>
+            <div class="content">
+                <p>{{ blog.noidung }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('blog') }}" class="btn btn-primary">Back to Blog</a>
+    </div>
+</div>
+{% endblock %}
