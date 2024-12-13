@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Your Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Your Profile</h1>
+
+    {% if user %}
+        <!-- User Information -->
+        <div class="card shadow-lg rounded-3 mb-4">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">User Information</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> {{ user[1] }}</p>
+                        <p><strong>Email:</strong> {{ user[2] }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Form -->
+        <div class="card shadow-lg rounded-3 mb-4">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Change Password</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="old_password" class="form-label">Old Password</label>
+                        <input type="password" name="old_password" class="form-control" id="old_password" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" name="new_password" class="form-control" id="new_password" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <input type="password" name="confirm_password" class="form-control" id="confirm_password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                </form>
+            </div>
+        </div>
+        
+    {% else %}
+        <div class="alert alert-danger text-center">
+            <strong>Error:</strong> User not found.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

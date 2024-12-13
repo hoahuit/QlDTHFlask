@@ -25,10 +25,16 @@
                     <h5 class="card-title text-truncate">{{ product.tendienthoai }}</h5>
                     <div class="price-wrapper mb-3">
                         {% if product.giamgia %}
-                            <span class="text-decoration-line-through text-muted me-2">${{ product.gia }}</span>
-                            <span class="text-danger fw-bold">${{ product.gia * (1 - product.giamgia/100) }}</span>
+                            <span class="text-decoration-line-through text-muted me-2">
+                                ${{ "{:,.0f}".format(product.gia).replace(',', '.') }}
+                            </span>
+                            <span class="text-danger fw-bold">
+                                ${{ "{:,.0f}".format(product.gia * (1 - product.giamgia/100)).replace(',', '.') }}
+                            </span>
                         {% else %}
-                            <span class="fw-bold">${{ product.gia }}</span>
+                            <span class="fw-bold">
+                                ${{ "{:,.0f}".format(product.gia).replace(',', '.') }}
+                            </span>
                         {% endif %}
                     </div>
                     <div class="d-grid gap-2">

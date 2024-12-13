@@ -3,6 +3,13 @@
 {% block title %}Your Cart{% endblock %}
 
 {% block content %}
+<style>
+    .price-wrapper {
+        white-space: nowrap;
+        display: inline-block;
+    }
+</style>
+
 <div class="container-fluid mt-5">
     <h1 class="text-center mb-5 fw-bold">Your Shopping Cart</h1>
     {% if cart %}
@@ -32,7 +39,7 @@
                         </div>
                         <div class="col-md-4">
                             <h5 class="fw-semibold mb-2">{{ item.name }}</h5>
-                            <p class="text-primary mb-0">${{ "%.2f" | format(item.price | float) }}</p>
+                            <p class="text-primary mb-0 price-wrapper">${{ '{:,.0f}'.format(item.price|float) }}</p>
                         </div>
                         <div class="col-md-3">
                             <form method="POST" 
@@ -51,8 +58,8 @@
                             </form>
                         </div>
                         <div class="col-md-2">
-                            <span class="fw-bold text-success">
-                                ${{ "%.2f" | format((item.price | float) * (item.quantity | int)) }}
+                            <span class="fw-bold text-success price-wrapper">
+                                ${{ '{:,.0f}'.format((item.price|float) * (item.quantity|int)) }}
                             </span>
                         </div>
                         <div class="col-md-1">
@@ -79,7 +86,7 @@
                     <div class="mb-4">
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Subtotal</span>
-                            <span class="fw-semibold">${{ "%.2f" | format(total | float) }}</span>
+                            <span class="fw-semibold price-wrapper">${{ '{:,.0f}'.format(total|float) }}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Shipping</span>
@@ -88,7 +95,7 @@
                         <hr>
                         <div class="d-flex justify-content-between mb-3">
                             <span class="h5">Total</span>
-                            <span class="h4 text-primary fw-bold">${{ "%.2f" | format(total | float) }}</span>
+                            <span class="h4 text-primary fw-bold price-wrapper">${{ '{:,.0f}'.format(total|float) }}</span>
                         </div>
                     </div>
                     

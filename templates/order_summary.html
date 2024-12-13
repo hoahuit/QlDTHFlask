@@ -31,7 +31,7 @@
                             <i class="fas fa-money-bill-wave text-primary me-2"></i>
                             <div>
                                 <small class="text-muted">Total Amount</small>
-                                <p class="mb-0 fw-bold text-success">${{ "%.2f" | format(order.tongtien) }}</p>
+                                <p class="mb-0 fw-bold text-success">{{ "{:,.0f}".format(order.tongtien).replace(',', '.') }}₫</p>
                             </div>
                         </div>
                     </div>
@@ -86,20 +86,20 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="text-center">${{ "%.2f" | format(item.dongia) }}</td>
+                                    <td class="text-center">{{ "{:,.0f}".format(item.dongia).replace(',', '.') }}₫</td>
                                     <td class="text-center">
                                         <span class="badge bg-light text-dark rounded-pill px-3 py-2">
                                             {{ item.soluong }}
                                         </span>
                                     </td>
-                                    <td class="text-end fw-bold">${{ "%.2f" | format(item.dongia * item.soluong) }}</td>
+                                    <td class="text-end fw-bold">{{ "{:,.0f}".format(item.dongia * item.soluong).replace(',', '.') }}₫</td>
                                 </tr>
                             {% endfor %}
                             <tr class="table-light">
                                 <td colspan="3" class="text-end fw-bold">Total Amount:</td>
                                 <td class="text-end">
                                     <span class="h5 text-success fw-bold mb-0">
-                                        ${{ "%.2f" | format(order.tongtien) }}
+                                        {{ "{:,.0f}".format(order.tongtien).replace(',', '.') }}₫
                                     </span>
                                 </td>
                             </tr>

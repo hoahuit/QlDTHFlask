@@ -5,9 +5,18 @@
 {% block content %}
 <div class="container py-5">
     <!-- Hero section -->
-    <div class="hero-section text-center mb-5">
-        <h1 class="display-3 fw-bold text-gradient mb-3">Welcome to Phone Store</h1>
-        <p class="lead text-muted">Discover the latest smartphones at the best prices</p>
+    <div class="hero-section text-center mb-5 p-5 bg-white shadow-lg rounded-3" style="background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);">
+        <div class="py-4">
+            <h4 class="display-2 fw-bold mb-4" style="background: linear-gradient(45deg, #6366f1, #a855f7, #ec4899);  -webkit-text-fill-color: transparent; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">
+                Welcome to Phone Store
+            </h4>
+            <p class="lead fs-3 mb-4" style="color: #64748b; font-weight: 300;">Discover the latest smartphones at the best prices</p>
+            <div class="hero-decoration">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 80px; z-index: 1;">
+                    <path fill="#f3f4f6" fill-opacity="0.5" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
+            </div>
+        </div>
     </div>
     
     <!-- Filter section -->
@@ -43,19 +52,28 @@
                         <a href="/product/{{ product.madt }}" class="action-btn">
                             <i class="fas fa-search"></i>
                         </a>
-                        <button class="action-btn add-to-cart">
-                            <i class="fas fa-shopping-cart"></i>
-                        </button>
+                        <form action="{{ url_for('add_to_cart', product_id=product.madt) }}" method="POST" class="d-inline">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="action-btn add-to-cart">
+                                <i class="fas fa-shopping-cart"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
                 <div class="card-body text-center">
                     <h5 class="card-title text-truncate">{{ product.tendienthoai }}</h5>
                     <div class="price-wrapper mb-3">
                         {% if product.giamgia %}
-                            <span class="text-decoration-line-through text-muted me-2">${{ product.gia }}</span>
-                            <span class="text-danger fw-bold">${{ product.gia * (1 - product.giamgia/100) }}</span>
+                            <span class="text-decoration-line-through text-muted me-2">
+                                ${{ "{:,.0f}".format(product.gia).replace(',', '.') }}
+                            </span>
+                            <span class="text-danger fw-bold">
+                                ${{ "{:,.0f}".format(product.gia * (1 - product.giamgia/100)).replace(',', '.') }}
+                            </span>
                         {% else %}
-                            <span class="fw-bold">${{ product.gia }}</span>
+                            <span class="fw-bold">
+                                ${{ "{:,.0f}".format(product.gia).replace(',', '.') }}
+                            </span>
                         {% endif %}
                     </div>
                 </div>
@@ -69,7 +87,6 @@
 /* Enhanced styling */
 .text-gradient {
     background: linear-gradient(45deg, #2937f0, #9f1ae2);
-    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 

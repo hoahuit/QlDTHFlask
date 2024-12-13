@@ -4,67 +4,57 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="card shadow-lg border-0 rounded-3">
-                <div class="card-body p-4">
-                    <h2 class="card-title text-center mb-4">
-                        <i class="fas fa-shipping-fast me-2"></i>Track Your Orders
-                    </h2>
+    <h1 class="text-center mb-5 fw-bold">Track Your Orders</h1>
 
-                    {% if orders %}
-                        <div class="list-group">
-                            {% for order in orders %}
-                                <div class="list-group-item list-group-item-action p-4 mb-3 rounded-3 border shadow-sm">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-6">
-                                            <h5 class="mb-3">
-                                                <span class="badge bg-primary rounded-pill me-2">#{{ order.madonhang }}</span>
-                                                Order Details
-                                            </h5>
-                                            <p class="mb-2">
-                                                <i class="far fa-calendar-alt me-2 text-muted"></i>
-                                                <span class="text-muted">Ordered on:</span> 
-                                                {{ order.ngaydat.strftime('%B %d, %Y') }}
-                                            </p>
-                                            <h4 class="mb-0 text-success">
-                                                <i class="fas fa-dollar-sign me-1"></i>
-                                                {{ "%.2f" | format(order.tongtien) }}
-                                            </h4>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="d-flex flex-column align-items-md-end mt-3 mt-md-0">
-                                                <div class="mb-2">
-                                                    <span class="badge bg-{{ 'success' if order.trangthai_thanhtoan == 'Paid' else 'warning' }} rounded-pill px-3 py-2">
-                                                        <i class="fas fa-credit-card me-1"></i>
-                                                        {{ order.trangthai_thanhtoan }}
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <span class="badge bg-{{ 'info' if order.trangthai_giaohang == 'Delivered' else 'secondary' }} rounded-pill px-3 py-2">
-                                                        <i class="fas fa-truck me-1"></i>
-                                                        {{ order.trangthai_giaohang }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
+    {% if orders %}
+    <div class="row">
+        {% for order in orders %}
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow-lg rounded-3">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-bold text-primary mb-3">
+                                <i class="fas fa-shopping-bag me-2"></i>Order #{{ order.madonhang }}
+                            </h5>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="far fa-calendar-alt text-muted me-2"></i>
+                                <span>{{ order.ngaydat }}</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-money-bill-wave text-muted me-2"></i>
+                                <span class="fw-bold text-success">{{ "{:,.0f}".format(order.tongtien).replace(',','.') }}₫</span>
+                            </div>
                         </div>
-                    {% else %}
-                        <div class="text-center py-5">
-                            <i class="fas fa-shopping-bag fa-4x text-muted mb-3"></i>
-                            <h4 class="text-muted">No Orders Yet</h4>
-                            <p class="text-muted mb-4">Looks like you haven't made any orders yet.</p>
-                            <a href="/" class="btn btn-primary rounded-pill px-4">
-                                Start Shopping <i class="fas fa-arrow-right ms-2"></i>
-                            </a>
+                        <div class="text-end">
+                            <div class="mb-2">
+                                <span class="badge bg-{{ 'success' if order.trangthai_thanhtoan == 'Paid' else 'warning' }} rounded-pill px-3 py-2">
+                                    <i class="fas fa-credit-card me-1"></i>{{ order.trangthai_thanhtoan }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="badge bg-info rounded-pill px-3 py-2">
+                                    <i class="fas fa-truck me-1"></i>{{ order.trangthai_giaohang }}
+                                </span>
+                            </div>
                         </div>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
+        {% endfor %}
     </div>
+    {% else %}
+    <div class="card shadow-lg rounded-3 p-5 text-center" style="max-width: 600px; margin: 0 auto;">
+        <div class="mb-4">
+            <i class="fas fa-box-open fa-4x text-muted"></i>
+        </div>
+        <h3 class="mb-3">No Orders Found</h3>
+        <p class="text-muted mb-4">You haven't placed any orders yet.</p>
+        <a href="/" class="btn btn-primary btn-lg rounded-pill px-5">
+            Start Shopping <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

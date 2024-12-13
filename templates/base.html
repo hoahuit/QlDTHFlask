@@ -523,20 +523,35 @@
            
                     
                     {% if session.get('user_id') %}
-                <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-user me-1"></i>Hello, {{ session.get('username') }}</a>
-                </li>
-     
-                <li class="nav-item">
-                    <a class="nav-link" href="/cart"><i class="fas fa-shopping-cart me-1"></i>Cart</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/track_order"><i class="fas fa-search me-1"></i>Track Order</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
-                </li>
-                {% else %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user me-1"></i>Hello, {{ session.get('username') }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('profile') }}">
+                                    <i class="fas fa-user-circle me-2"></i>Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/cart">
+                                    <i class="fas fa-shopping-cart me-2"></i>Cart
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/track_order">
+                                    <i class="fas fa-search me-2"></i>Track Order
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/logout">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
                 </li>
