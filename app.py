@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Thay 'your_secret_key' bằng chuỗi bất kỳ
 # Kết nối cơ sở dữ liệu
 def get_db_connection():
-    connection = pyodbc.connect('DRIVER={SQL Server};SERVER=THLONE\SQLEXPRESS;DATABASE=quanlybandienthoai;Trusted_Connection=yes')
+    connection = pyodbc.connect('DRIVER={SQL Server};SERVER=minhhoa;DATABASE=quanlybandienthoai;Trusted_Connection=yes')
     return connection
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
@@ -748,6 +748,9 @@ def profile():
     return render_template('profile.html', user=user)
 @app.route('/add-to-cart/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
+    if 'user_id' not in session:  # Kiểm tra xem người dùng đã đăng nhập chưa
+        flash('You must log in to add items to the cart.', 'warning')
+        return redirect(url_for('login'))    
     quantity = int(request.form.get('quantity', 1))  # Chuyển đổi số lượng sang kiểu int
     
     # Kết nối database để lấy thông tin sản phẩm
@@ -821,13 +824,14 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
-# Đăng nhập
+# Route login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
         
+        # Kết nối CSDL
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT mand, tennguoidung FROM nguoidung WHERE email = ? AND matkhau = ?", email, password)
@@ -837,11 +841,12 @@ def login():
         if user:
             session['user_id'] = user.mand
             session['username'] = user.tennguoidung
-            flash('Đăng nhập thành công!', 'success')
-            return redirect(url_for('index'))
+            return {"status": "success", "message": "Đăng nhập thành công!", "redirect": "/"}
         else:
-            flash('Email hoặc mật khẩu không đúng.', 'danger')
+            return {"status": "error", "message": "Email hoặc mật khẩu không đúng."}, 401
+    
     return render_template('login.html')
+
 
 # Đăng xuất
 @app.route('/logout')

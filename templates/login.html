@@ -11,7 +11,7 @@
                     <h3 class="mb-0">Welcome Back</h3>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="/login">
+                    <form id="loginForm" method="POST" action="/login">
                         <div class="mb-4">
                             <label for="email" class="form-label fw-bold">Email Address</label>
                             <div class="input-group">
@@ -30,6 +30,10 @@
                             <button type="submit" class="btn btn-primary btn-lg">Sign In</button>
                         </div>
                     </form>
+                    <div id="loginMessage" class="mt-3"></div> <!-- Thông báo -->
+                    <div id="loadingSpinner" class="spinner-border text-primary d-none" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </div>
                 <div class="card-footer text-center py-3">
                     <div class="small">
@@ -41,4 +45,42 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelector("#loginForm").addEventListener("submit", async function (event) {
+        event.preventDefault(); // Ngăn form gửi theo cách thông thường
+
+        // Lấy dữ liệu từ form
+        const formData = new FormData(this);
+        const loginMessage = document.querySelector("#loginMessage");
+        const spinner = document.querySelector("#loadingSpinner");
+        loginMessage.innerHTML = ""; // Xóa thông báo trước đó nếu có
+        spinner.classList.remove("d-none"); // Hiện spinner
+
+        try {
+            // Gửi request AJAX
+            const response = await fetch(this.action, {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json(); // Parse kết quả JSON
+            spinner.classList.add("d-none"); // Ẩn spinner
+
+            // Hiển thị thông báo từ server
+            if (result.status === "success") {
+                loginMessage.innerHTML = `<div class="alert alert-success">${result.message}</div>`;
+                setTimeout(() => {
+                    window.location.href = result.redirect || "/"; // Chuyển hướng
+                }, 2000);
+            } else {
+                loginMessage.innerHTML = `<div class="alert alert-danger">${result.message}</div>`;
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            spinner.classList.add("d-none"); // Ẩn spinner
+            loginMessage.innerHTML = `<div class="alert alert-danger">Something went wrong. Please try again later.</div>`;
+        }
+    });
+</script>
 {% endblock %}
